@@ -6,6 +6,14 @@ Sean.rest is an API-first archive of short reviewed Big Sean lyric snippets, ran
 
 Full lyrics are not hosted.
 
+## Demo
+
+```txt
+GET /demo
+```
+
+The demo is a small Y2K-style preview page that uses approved bars, including synthetic test records while the real dataset is being reviewed.
+
 ## Usage
 
 ```txt
@@ -51,6 +59,7 @@ GET https://api.sean.rest?format=text&include_synthetic=true
 
 ```txt
 GET /                                      Random approved real bar
+GET /demo                                  Visible Y2K-style demo page
 GET /?include_synthetic=true              Random approved synthetic or real bar
 GET /?format=text                         Text-only random approved real bar
 GET /top?limit=10                         Highest-pungency approved real bars
