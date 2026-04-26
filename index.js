@@ -1,4 +1,4 @@
-const REPO_BASE = 'https://raw.githubusercontent.com/Kendubu1/kanye.rest/sean-rest-bootstrap';
+const REPO_BASE = 'https://raw.githubusercontent.com/Kendubu1/kanye.rest/master';
 
 const jsonHeaders = {
 	'Access-Control-Allow-Origin': '*',
