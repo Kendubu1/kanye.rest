@@ -6,11 +6,17 @@
     "scripts": {
         "test": "node scripts/validate-bars.js",
         "validate": "node scripts/validate-bars.js",
+        "smoke": "node scripts/smoke-test-api.js",
+        "lyrics:test": "node scripts/test-lyrics-pull.js",
+        "dev": "wrangler dev",
         "format": "prettier --write '**/*.{js,css,json,md}'"
     },
     "author": "Kendubu1",
     "license": "MIT",
     "dependencies": {
         "prettier": "^1.18.2"
+    },
+    "devDependencies": {
+        "wrangler": "^4.13.0"
     }
 }
