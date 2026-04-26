@@ -12,6 +12,12 @@ Full lyrics are not hosted.
 GET https://api.sean.rest
 ```
 
+By default, synthetic test data is hidden. Until real approved bars are added, use this for local/API testing:
+
+```txt
+GET https://api.sean.rest?include_synthetic=true
+```
+
 Example JSON response:
 
 ```json
@@ -38,21 +44,23 @@ Example JSON response:
 Text-only response:
 
 ```txt
-GET https://api.sean.rest?format=text
+GET https://api.sean.rest?format=text&include_synthetic=true
 ```
 
 ## Routes
 
 ```txt
-GET /                         Random approved bar
-GET /?format=text             Text-only random approved bar
-GET /top?limit=10             Highest-pungency approved bars
-GET /projects                 List source projects
-GET /project/:slug            Random approved bar from a project
-GET /track/:slug              Approved bars from a specific song
-GET /level/:cheese_level      Approved bars by cheese level
-GET /pungency/:min            Approved bars at or above a pungency threshold
-GET /health                   API health check
+GET /                                      Random approved real bar
+GET /?include_synthetic=true              Random approved synthetic or real bar
+GET /?format=text                         Text-only random approved real bar
+GET /top?limit=10                         Highest-pungency approved real bars
+GET /projects                             List source projects
+GET /stats                                API data stats
+GET /project/:slug                        Random approved real bar from a project
+GET /track/:slug                          Approved real bars from a specific song
+GET /level/:cheese_level                  Approved real bars by cheese level
+GET /pungency/:min                        Approved real bars at or above a pungency threshold
+GET /health                               API health check
 ```
 
 ## Starting project scope
@@ -78,12 +86,15 @@ GET /health                   API health check
 
 - [Feature spec](docs/feature-doc.md)
 - [Scoring model](docs/scoring-model.md)
+- [Candidate intake](candidates/README.md)
 
 ## Data policy
 
 Sean.rest may analyze explicit rap lyrics in context, but the public API should only serve short reviewed snippets. Full lyrics should not be stored or returned.
 
 Records must be marked `approved_public: true` before the API serves them.
+
+Candidate files in `candidates/` are for review intake only and are not served by the API.
 
 ## Development
 
