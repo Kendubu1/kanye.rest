@@ -26,6 +26,11 @@ function publicBars(bars) {
 	return bars.filter((bar) => bar.approved_public === true);
 }
 
+function applySyntheticFilter(bars, includeSynthetic) {
+	if (includeSynthetic) return bars;
+	return bars.filter((bar) => bar.synthetic !== true);
+}
+
 function randomItem(items) {
 	return items[Math.floor(Math.random() * items.length)];
 }
@@ -36,6 +41,35 @@ function normalizeLevel(level) {
 
 function asText(bar) {
 	return `${bar.bar} — ${bar.song}, ${bar.project} (${bar.cheese_level}, ${bar.pungency}% pungency)`;
+}
+
+function buildStats(bars, projects) {
+	const approvedBars = publicBars(bars);
+	const realApprovedBars = approvedBars.filter((bar) => bar.synthetic !== true);
+	const syntheticBars = bars.filter((bar) => bar.synthetic === true);
+	const projectCounts = projects.map((project) => {
+		const projectBars = bars.filter((bar) => bar.project_slug === project.slug);
+		return {
+			name: project.name,
+			slug: project.slug,
+			type: project.type,
+			total_bars: projectBars.length,
+			approved_bars: projectBars.filter((bar) => bar.approved_public === true).length,
+			real_approved_bars: projectBars.filter((bar) => bar.approved_public === true && bar.synthetic !== true).length,
+			synthetic_bars: projectBars.filter((bar) => bar.synthetic === true).length
+		};
+	});
+
+	return {
+		service: 'sean.rest',
+		lyrics_hosted: false,
+		total_bars: bars.length,
+		approved_public_bars: approvedBars.length,
+		real_approved_bars: realApprovedBars.length,
+		synthetic_bars: syntheticBars.length,
+		projects: projects.length,
+		project_counts: projectCounts
+	};
 }
 
 function jsonResponse(payload, status = 200) {
@@ -59,6 +93,7 @@ async function handleRequest(request) {
 		const segments = path ? path.split('/') : [];
 		const format = (url.searchParams.get('format') || '').toLowerCase().split('/')[0];
 		const wantsText = format === 'text' || request.headers.get('Accept') === 'text/plain';
+		const includeSynthetic = url.searchParams.get('include_synthetic') === 'true';
 
 		if (format && format !== 'json' && format !== 'text') {
 			return textResponse('Invalid format parameter. Use json or text.', 400);
@@ -69,16 +104,21 @@ async function handleRequest(request) {
 		}
 
 		const bars = await fetchJson('bars.json');
-		const approvedBars = publicBars(bars);
+		const approvedBars = applySyntheticFilter(publicBars(bars), includeSynthetic);
 
 		if (segments[0] === 'projects') {
 			const projects = await fetchJson('projects.json');
 			return jsonResponse({ projects });
 		}
 
+		if (segments[0] === 'stats') {
+			const projects = await fetchJson('projects.json');
+			return jsonResponse(buildStats(bars, projects));
+		}
+
 		if (!approvedBars.length) {
 			return jsonResponse({
-				message: 'No approved public bars yet.',
+				message: includeSynthetic ? 'No approved public bars yet.' : 'No approved real bars yet. Add include_synthetic=true to use synthetic test data.',
 				service: 'sean.rest',
 				lyrics_hosted: false
 			}, 503);

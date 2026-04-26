@@ -1,0 +1,26 @@
+[
+  {
+    "candidate_id": "detroit-candidate-001",
+    "artist": "Big Sean",
+    "song": "Song Title Pending Review",
+    "song_slug": "song-title-pending-review",
+    "project": "Detroit",
+    "project_slug": "detroit",
+    "project_type": "mixtape",
+    "year": 2012,
+    "track_number": null,
+    "section": "verse pending review",
+    "line_position": "unknown",
+    "timestamp_start": null,
+    "timestamp_end": null,
+    "snippet_status": "not_added",
+    "candidate_snippet": null,
+    "candidate_note": "Potential forced wordplay/caption energy. Add only a short reviewed snippet after manual review.",
+    "source": {
+      "provider": "pending",
+      "url": null,
+      "lyrics_hosted": false
+    },
+    "review_status": "needs_review"
+  }
+]
