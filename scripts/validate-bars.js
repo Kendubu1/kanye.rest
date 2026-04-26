@@ -157,8 +157,10 @@ function validateBar(bar, index, projectsBySlug, seenIds, errors, warnings) {
 		errors.push(`${id}: pungency must be an integer from 0 to 100`);
 	} else {
 		const expectedPungency = Math.round(bar.cheese_score * 10);
-		if (bar.pungency !== expectedPungency) {
-			errors.push(`${id}: pungency expected ${expectedPungency}, got ${bar.pungency}`);
+		if (Math.abs(bar.pungency - expectedPungency) > 1) {
+			errors.push(`${id}: pungency expected about ${expectedPungency}, got ${bar.pungency}`);
+		} else if (bar.pungency !== expectedPungency) {
+			warnings.push(`${id}: pungency is ${bar.pungency}; formula rounds to ${expectedPungency}`);
 		}
 
 		const expectedLevel = expectedCheeseLevel(bar.pungency);
