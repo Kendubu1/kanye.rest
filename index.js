@@ -14,6 +14,13 @@ const textHeaders = {
 	'Content-Type': 'text/plain'
 };
 
+const htmlHeaders = {
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Methods': 'GET',
+	'Access-Control-Allow-Headers': 'Content-Type',
+	'Content-Type': 'text/html; charset=utf-8'
+};
+
 async function fetchJson(path) {
 	const response = await fetch(`${REPO_BASE}/${path}`);
 	if (!response.ok) {
@@ -37,6 +44,15 @@ function randomItem(items) {
 
 function normalizeLevel(level) {
 	return level.toLowerCase().replace(/\s+/g, '-');
+}
+
+function escapeHtml(value) {
+	return String(value || '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
 }
 
 function asText(bar) {
@@ -72,6 +88,150 @@ function buildStats(bars, projects) {
 	};
 }
 
+function demoHtml(bar, stats) {
+	const isSynthetic = bar.synthetic === true;
+	const pungency = Math.max(0, Math.min(100, Number(bar.pungency) || 0));
+	const tags = Array.isArray(bar.tags) ? bar.tags : [];
+	const sourceLabel = bar.source && bar.source.provider ? bar.source.provider : 'unknown';
+
+	return `<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Sean.rest Cheese Chamber</title>
+	<style>
+		:root { color-scheme: dark; }
+		* { box-sizing: border-box; }
+		body {
+			min-height: 100vh;
+			margin: 0;
+			font-family: "Trebuchet MS", Verdana, sans-serif;
+			background:
+				radial-gradient(circle at top left, rgba(255, 0, 255, 0.34), transparent 28rem),
+				radial-gradient(circle at bottom right, rgba(0, 255, 255, 0.28), transparent 26rem),
+				linear-gradient(135deg, #130020 0%, #06000d 48%, #001b23 100%);
+			color: #fff7d6;
+			overflow-x: hidden;
+		}
+		body:before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			background-image:
+				linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+			background-size: 28px 28px;
+			mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent);
+		}
+		.wrapper { width: min(980px, calc(100% - 28px)); margin: 0 auto; padding: 34px 0 44px; }
+		.marquee {
+			border: 2px solid #fff700;
+			background: #050505;
+			box-shadow: 0 0 18px #ff00ff, inset 0 0 12px rgba(255,255,255,.18);
+			padding: 9px 12px;
+			font-size: 13px;
+			letter-spacing: .09em;
+			text-transform: uppercase;
+			color: #00ffff;
+		}
+		.hero { text-align: center; margin: 30px 0 24px; }
+		h1 {
+			margin: 0;
+			font-size: clamp(48px, 12vw, 118px);
+			line-height: .86;
+			letter-spacing: -0.07em;
+			text-transform: uppercase;
+			color: #fff;
+			text-shadow: 3px 3px 0 #ff00ff, 6px 6px 0 #00ffff, 0 0 28px #fff700;
+		}
+		.subtitle { margin: 18px auto 0; max-width: 720px; color: #ffe78a; font-size: 18px; }
+		.card {
+			position: relative;
+			margin: 28px auto 0;
+			border: 3px ridge #f5d76e;
+			background: linear-gradient(180deg, rgba(35, 12, 54, .96), rgba(7, 3, 15, .96));
+			box-shadow: 0 0 0 4px #2a0042, 0 0 30px rgba(255,0,255,.45), 0 0 55px rgba(0,255,255,.24);
+			padding: clamp(18px, 4vw, 34px);
+			border-radius: 18px;
+		}
+		.badge {
+			display: inline-flex;
+			gap: 8px;
+			align-items: center;
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: #fff700;
+			color: #22002f;
+			font-weight: 900;
+			text-transform: uppercase;
+			font-size: 12px;
+			letter-spacing: .08em;
+		}
+		.bar {
+			margin: 24px 0 18px;
+			font-family: Georgia, serif;
+			font-size: clamp(30px, 7vw, 58px);
+			line-height: 1.02;
+			color: #ffffff;
+			text-shadow: 0 0 14px rgba(255,255,255,.26);
+		}
+		.meta { color: #9ffcff; font-size: 17px; margin-bottom: 24px; }
+		.meter-wrap { margin: 24px 0 10px; }
+		.meter-label { display: flex; justify-content: space-between; gap: 12px; font-weight: 900; text-transform: uppercase; color: #fff700; }
+		.meter {
+			width: 100%; height: 26px; border: 2px solid #fff; background: #16001f; border-radius: 999px; overflow: hidden;
+			box-shadow: inset 0 0 12px #000;
+		}
+		.fill { width: ${pungency}%; height: 100%; background: linear-gradient(90deg, #00ffff, #fff700, #ff00ff); box-shadow: 0 0 20px #fff700; }
+		.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 22px; }
+		.stat { border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.06); padding: 12px; border-radius: 12px; }
+		.stat b { display: block; color: #fff700; font-size: 12px; text-transform: uppercase; margin-bottom: 6px; }
+		.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+		.tag { border: 1px solid #00ffff; color: #00ffff; border-radius: 999px; padding: 6px 10px; font-size: 13px; background: rgba(0,255,255,.08); }
+		.notice { margin-top: 18px; color: #ffb7ff; font-size: 14px; }
+		.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 24px; }
+		a { color: inherit; }
+		.button { display: inline-block; padding: 12px 16px; border: 2px outset #fff700; background: #ff00ff; color: white; text-decoration: none; font-weight: 900; text-transform: uppercase; border-radius: 10px; box-shadow: 0 0 16px rgba(255,0,255,.55); }
+		.footer { text-align: center; color: #9a8aa8; margin-top: 26px; font-size: 13px; }
+	</style>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="marquee">🧀 Sean.rest Cheese Chamber // API-first // full lyrics not hosted // pungency meter online</div>
+		<section class="hero">
+			<h1>Sean.rest</h1>
+			<p class="subtitle">A ridiculous API for Big Sean's cheesiest bars — now with a fake Y2K demo screen while the real review pipeline cooks.</p>
+		</section>
+		<main class="card">
+			<span class="badge">${escapeHtml(bar.cheese_level)} · ${pungency}% pungent</span>
+			<div class="bar">“${escapeHtml(bar.bar)}”</div>
+			<div class="meta">${escapeHtml(bar.song)} · ${escapeHtml(bar.project)} · ${escapeHtml(bar.section)}</div>
+			<div class="meter-wrap">
+				<div class="meter-label"><span>Pungency meter</span><span>${pungency}/100</span></div>
+				<div class="meter"><div class="fill"></div></div>
+			</div>
+			<div class="grid">
+				<div class="stat"><b>Verdict</b>${escapeHtml(bar.verdict)}</div>
+				<div class="stat"><b>Source</b>${escapeHtml(sourceLabel)} · lyrics hosted: false</div>
+				<div class="stat"><b>Dataset</b>${isSynthetic ? 'Synthetic test record' : 'Reviewed real record'}</div>
+				<div class="stat"><b>API stats</b>${stats.real_approved_bars} real · ${stats.synthetic_bars} synthetic</div>
+			</div>
+			<div class="tags">${tags.map((tag) => `<span class="tag">#${escapeHtml(tag)}</span>`).join('')}</div>
+			${isSynthetic ? '<p class="notice">This is synthetic placeholder data for demo/testing — not an actual Big Sean lyric.</p>' : ''}
+			<div class="actions">
+				<a class="button" href="/demo">Randomize</a>
+				<a class="button" href="/?include_synthetic=true">JSON</a>
+				<a class="button" href="/stats">Stats</a>
+			</div>
+		</main>
+		<div class="footer">© Sean.rest test chamber · API-first, site later · no full lyrics stored</div>
+	</div>
+</body>
+</html>`;
+}
+
 function jsonResponse(payload, status = 200) {
 	return new Response(JSON.stringify(payload, null, 2), {
 		status,
@@ -83,6 +243,13 @@ function textResponse(payload, status = 200) {
 	return new Response(payload, {
 		status,
 		headers: textHeaders
+	});
+}
+
+function htmlResponse(payload, status = 200) {
+	return new Response(payload, {
+		status,
+		headers: htmlHeaders
 	});
 }
 
@@ -114,6 +281,15 @@ async function handleRequest(request) {
 		if (segments[0] === 'stats') {
 			const projects = await fetchJson('projects.json');
 			return jsonResponse(buildStats(bars, projects));
+		}
+
+		if (segments[0] === 'demo') {
+			const projects = await fetchJson('projects.json');
+			const demoBars = publicBars(bars);
+			if (!demoBars.length) {
+				return htmlResponse('<!doctype html><title>Sean.rest</title><h1>No demo bars available yet.</h1>', 503);
+			}
+			return htmlResponse(demoHtml(randomItem(demoBars), buildStats(bars, projects)));
 		}
 
 		if (!approvedBars.length) {
