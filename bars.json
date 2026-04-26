@@ -1,0 +1,40 @@
+[
+  {
+    "id": "detroit-001",
+    "artist": "Big Sean",
+    "song": "Song Title Pending Review",
+    "song_slug": "song-title-pending-review",
+    "project": "Detroit",
+    "project_slug": "detroit",
+    "project_type": "mixtape",
+    "year": 2012,
+    "track_number": null,
+    "section": "verse pending review",
+    "line_position": "unknown",
+    "timestamp_start": null,
+    "timestamp_end": null,
+    "bar": "Short reviewed snippet pending approval.",
+    "explicit": false,
+    "content_flags": [],
+    "scores": {
+      "forced_wordplay": 0,
+      "caption_energy": 0,
+      "setup_payoff_cringe": 0,
+      "pungency_memorability": 0,
+      "delivery_contrast": 0,
+      "explicitness_modifier": 0
+    },
+    "cheese_score": 0,
+    "pungency": 0,
+    "cheese_level": "Mozzarella",
+    "tags": ["seed-data"],
+    "verdict": "Placeholder record used to validate the API shape before lyric review.",
+    "source": {
+      "provider": "pending",
+      "url": null,
+      "lyrics_hosted": false
+    },
+    "review_status": "needs_review",
+    "approved_public": false
+  }
+]
