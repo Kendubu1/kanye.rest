@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Dark Sky Paradise",
+    "slug": "dark-sky-paradise",
+    "type": "album",
+    "year": 2015,
+    "priority": 1
+  },
+  {
+    "name": "Detroit 2",
+    "slug": "detroit-2",
+    "type": "album",
+    "year": 2020,
+    "priority": 2
+  },
+  {
+    "name": "I Decided.",
+    "slug": "i-decided",
+    "type": "album",
+    "year": 2017,
+    "priority": 3
+  },
+  {
+    "name": "Finally Famous",
+    "slug": "finally-famous",
+    "type": "album",
+    "year": 2011,
+    "priority": 4
+  },
+  {
+    "name": "Hall of Fame",
+    "slug": "hall-of-fame",
+    "type": "album",
+    "year": 2013,
+    "priority": 5
+  },
+  {
+    "name": "Detroit",
+    "slug": "detroit",
+    "type": "mixtape",
+    "year": 2012,
+    "priority": 6
+  }
+]
